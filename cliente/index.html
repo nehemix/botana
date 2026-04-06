@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Botana Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #08060a;
+            --text-color: #f0f0f0;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-color: #ff2d55;
+            --accent-glow: rgba(255, 45, 85, 0.6);
+            --bot-bubble: rgba(20, 15, 25, 0.95);
+            --user-bubble: linear-gradient(135deg, #ff2d55, #8e2de2);
+            --header-h: 100px; 
+            --input-h: 80px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Quicksand', sans-serif;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .neon-sphere {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: var(--accent-glow);
+            filter: blur(100px);
+            z-index: -1;
+            animation: moveLights 20s infinite alternate linear;
+        }
+        .sphere-2 { background: rgba(142, 45, 226, 0.3); right: -20px; bottom: -20px; }
+
+        @keyframes moveLights {
+            from { transform: translate(-10%, -10%); }
+            to { transform: translate(10%, 10%); }
+        }
+
+        .app-container {
+            width: 100%;
+            height: 100dvh; 
+            display: flex;
+            flex-direction: column;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            animation: fadeIn 0.8s ease;
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            .app-container {
+                width: 1000px;
+                height: 85vh;
+                border-radius: 40px;
+                border: 1px solid var(--glass-border);
+                box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            }
+        }
+
+        .header {
+            height: var(--header-h);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+
+        .avatar-circle {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            padding: 2px;
+            background: linear-gradient(45deg, var(--accent-color), #8e2de2);
+            box-shadow: 0 0 20px var(--accent-glow);
+            margin-bottom: 5px;
+        }
+
+        .avatar-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+        .header h1 {
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+            animation: glowPulse 2s infinite alternate;
+        }
+
+        @keyframes glowPulse {
+            from { text-shadow: 0 0 8px var(--accent-color); opacity: 0.8; }
+            to { text-shadow: 0 0 15px var(--accent-color), 0 0 25px #8e2de2; opacity: 1; }
+        }
+
+        #chat-window {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scrollbar-width: none;
+        }
+        #chat-window::-webkit-scrollbar { display: none; }
+
+        .msg {
+            max-width: 82%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+            animation: msgPop 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+
+        .bot { align-self: flex-start; background: var(--bot-bubble); border: 1px solid var(--glass-border); border-bottom-left-radius: 4px; }
+        .user { align-self: flex-end; background: var(--user-bubble); border-bottom-right-radius: 4px; color: #fff; }
+
+        @keyframes msgPop { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        .input-area {
+            height: var(--input-h);
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.4);
+            border-top: 1px solid var(--glass-border);
+            flex-shrink: 0;
+        }
+
+        input {
+            flex: 1;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border);
+            padding: 14px 20px;
+            border-radius: 30px;
+            color: #fff;
+            outline: none;
+            font-size: 16px !important; 
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--accent-color);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="neon-sphere"></div>
+    <div class="neon-sphere sphere-2"></div>
+
+    <div class="app-container">
+        <header class="header">
+            <div class="avatar-circle">
+                <img src="botana.webp" alt="Botana">
+            </div>
+            <h1>Botana</h1>
+        </header>
+
+        <div id="chat-window"></div>
+
+        <footer class="input-area">
+            <input type="text" id="userInput" placeholder="Escribile algo..." autocomplete="off" onkeypress="handleKey(event)">
+            <button class="send-btn" onclick="enviar()">➜</button>
+        </footer>
+    </div>
+
+    <script>
+        const sid = localStorage.getItem('botana_sid') || ('web-' + Math.random().toString(36).substr(2, 9));
+        localStorage.setItem('botana_sid', sid);
+
+        const chatWindow = document.getElementById('chat-window');
+        const input = document.getElementById('userInput');
+
+        async function enviar() {
+            const mensaje = input.value.trim();
+            if (!mensaje) return;
+            appendMsg(mensaje, 'user');
+            input.value = '';
+            
+            try {
+                // CAMBIO CLAVE: Usamos ruta relativa '/chat' para el deploy
+                const res = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mensaje, sessionId: sid })
+                });
+                const data = await res.json();
+                appendMsg(data.respuesta, 'bot');
+            } catch (e) {
+                appendMsg('error de conexión f', 'bot');
+            }
+        }
+
+        function appendMsg(text, type) {
+            const div = document.createElement('div');
+            div.className = `msg ${type}`;
+            div.textContent = text;
+            chatWindow.appendChild(div);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function handleKey(e) { if (e.key === 'Enter') enviar(); }
+
+        window.visualViewport.addEventListener('resize', () => {
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        });
+
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
