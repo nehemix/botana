@@ -9,13 +9,11 @@ function obtenerHistorial(sessionId) {
 
 function guardarMensaje(sessionId, role, text) {
   const historial = obtenerHistorial(sessionId);
-  // Formato nativo de Google Generative AI
   historial.push({ role, parts: [{ text }] });
   
-  // Si la charla es muy larga (más de 15 mensajes), borramos lo viejo
-  // para que no te consuma tantos tokens ni se tilde
-  if (historial.length > 15) {
-    memorias[sessionId] = historial.slice(-15);
+  // Mantenemos solo los últimos 10 mensajes para que no se pierda el hilo ni gastes tokens de más
+  if (historial.length > 10) {
+    memorias[sessionId] = historial.slice(-10);
   }
 }
 

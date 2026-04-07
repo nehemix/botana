@@ -15,8 +15,7 @@
             --accent-glow: rgba(255, 45, 85, 0.6);
             --bot-bubble: rgba(20, 15, 25, 0.95);
             --user-bubble: linear-gradient(135deg, #ff2d55, #8e2de2);
-            --header-h: 100px; 
-            --input-h: 80px;
+            --header-h: 80px; 
         }
 
         * {
@@ -90,29 +89,23 @@
         }
 
         .avatar-circle {
-            width: 55px;
-            height: 55px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             padding: 2px;
             background: linear-gradient(45deg, var(--accent-color), #8e2de2);
-            box-shadow: 0 0 20px var(--accent-glow);
+            box-shadow: 0 0 15px var(--accent-glow);
             margin-bottom: 5px;
         }
 
         .avatar-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
         .header h1 {
-            font-size: 1.2rem;
-            letter-spacing: 3px;
+            font-size: 1rem;
+            letter-spacing: 2px;
             text-transform: uppercase;
             color: #fff;
-            text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
-            animation: glowPulse 2s infinite alternate;
-        }
-
-        @keyframes glowPulse {
-            from { text-shadow: 0 0 8px var(--accent-color); opacity: 0.8; }
-            to { text-shadow: 0 0 15px var(--accent-color), 0 0 25px #8e2de2; opacity: 1; }
+            text-shadow: 0 0 10px var(--accent-color);
         }
 
         #chat-window {
@@ -128,44 +121,83 @@
 
         .msg {
             max-width: 82%;
-            padding: 14px 18px;
+            padding: 12px 16px;
             border-radius: 20px;
             font-size: 0.95rem;
             line-height: 1.4;
             word-wrap: break-word;
-            animation: msgPop 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+            white-space: pre-wrap; 
+            animation: msgPop 0.3s ease-out forwards;
         }
 
         .bot { align-self: flex-start; background: var(--bot-bubble); border: 1px solid var(--glass-border); border-bottom-left-radius: 4px; }
         .user { align-self: flex-end; background: var(--user-bubble); border-bottom-right-radius: 4px; color: #fff; }
 
-        @keyframes msgPop { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes msgPop { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
         .input-area {
-            height: var(--input-h);
-            padding: 0 15px;
+            min-height: 70px;
+            padding: 12px 15px;
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             gap: 10px;
             background: rgba(0,0,0,0.4);
             border-top: 1px solid var(--glass-border);
             flex-shrink: 0;
         }
 
-        input {
+        textarea {
             flex: 1;
             background: rgba(255,255,255,0.06);
             border: 1px solid var(--glass-border);
-            padding: 14px 20px;
-            border-radius: 30px;
+            padding: 12px 18px;
+            border-radius: 22px;
             color: #fff;
             outline: none;
-            font-size: 16px !important; 
+            font-size: 16px;
+            touch-action: manipulation;
+            font-family: inherit;
+            resize: none;
+            max-height: 150px;
+            overflow-y: auto;
+            transition: border 0.3s;
+            line-height: 1.2;
+            scrollbar-width: none;
+        }
+        textarea::-webkit-scrollbar { display: none; }
+        textarea:focus { border-color: var(--accent-color); }
+
+        /* ESTILO DEL BOTÓN DE LIMPIAR */
+        .clear-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-bottom: 2px;
+        }
+
+        .clear-btn:hover {
+            background: rgba(255, 45, 85, 0.2);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .clear-btn:active {
+            transform: scale(0.9);
         }
 
         .send-btn {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             border: none;
             background: var(--accent-color);
@@ -176,7 +208,11 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 0 15px var(--accent-glow);
+            flex-shrink: 0;
+            margin-bottom: 2px;
+            transition: transform 0.2s;
         }
+        .send-btn:active { transform: scale(0.9); }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -197,26 +233,49 @@
         <div id="chat-window"></div>
 
         <footer class="input-area">
-            <input type="text" id="userInput" placeholder="Escribile algo..." autocomplete="off" onkeypress="handleKey(event)">
+            <button class="clear-btn" onclick="limpiarMemoria()" title="Borrar memoria">🗑️</button>
+            <textarea id="userInput" placeholder="Escribile algo..." autocomplete="off" rows="1"></textarea>
             <button class="send-btn" onclick="enviar()">➜</button>
         </footer>
     </div>
 
     <script>
+        // SID dinámico para manejar sesiones
         const sid = localStorage.getItem('botana_sid') || ('web-' + Math.random().toString(36).substr(2, 9));
         localStorage.setItem('botana_sid', sid);
 
         const chatWindow = document.getElementById('chat-window');
         const input = document.getElementById('userInput');
 
+        // Función para limpiar memoria
+        function limpiarMemoria() {
+            if (confirm("¿Querés reiniciar la memoria de Botana?")) {
+                localStorage.removeItem('botana_sid'); // Borramos el ID local
+                location.reload(); // Recargamos para generar un ID limpio
+            }
+        }
+
+        input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                enviar();
+            }
+        });
+
         async function enviar() {
             const mensaje = input.value.trim();
             if (!mensaje) return;
+
             appendMsg(mensaje, 'user');
             input.value = '';
+            input.style.height = 'auto';
             
             try {
-                // CAMBIO CLAVE: Usamos ruta relativa '/chat' para el deploy
                 const res = await fetch('/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -225,7 +284,7 @@
                 const data = await res.json();
                 appendMsg(data.respuesta, 'bot');
             } catch (e) {
-                appendMsg('error de conexión f', 'bot');
+                appendMsg('Error de conexión. Inténtalo de nuevo.', 'bot');
             }
         }
 
@@ -234,18 +293,26 @@
             div.className = `msg ${type}`;
             div.textContent = text;
             chatWindow.appendChild(div);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
+            
+            chatWindow.scrollTo({
+                top: chatWindow.scrollHeight,
+                behavior: 'smooth'
+            });
         }
-
-        function handleKey(e) { if (e.key === 'Enter') enviar(); }
 
         window.visualViewport.addEventListener('resize', () => {
             chatWindow.scrollTop = chatWindow.scrollHeight;
         });
+    </script>
+    <script src="script.js">
+        // Bloqueo total de zoom por gestos
+document.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
 
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length > 1) e.preventDefault();
-        }, { passive: false });
+document.addEventListener('gesturestart', (e) => {
+    e.preventDefault();
+});
     </script>
 </body>
 </html>

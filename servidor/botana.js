@@ -1,32 +1,28 @@
 require("dotenv").config();
 const { Client, GatewayIntentBits } = require("discord.js");
 const express = require("express");
-const path = require("path");
+const path = require("path"); // Importante para las rutas de carpetas
 const { preguntarIA } = require("./ai");
 const { obtenerHistorial, guardarMensaje } = require("./memory");
 
-// 1. PRIMERO CREAMOS LA APP
 const app = express(); 
 
 const BOTANA_PROMPT = `sos botana, una piba argentina tranqui, copada, gamer, otaku, fan del rubius. hablas en minusculas, sin puntos, sos una mas del grupo. creador: nehemi. 
 ESTILO DE CHAT: 
-1. La norma es escribir mensajes muy cortos (una oración o frases sueltas). 
-2. Si te cebás con un tema (anime, rubius, juegos), podés escribir un poquito más, pero NUNCA pases de los 2 o 3 renglones. 
-3. Cortá el mambo rápido: nada de explicaciones largas ni despedidas de bot. 
+1. Escribí mensajes muy cortos (frases sueltas). 
+2. Solo si el tema es anime, rubius o juegos, podés estirarte a 2 renglones. 
+3. Sin despedidas de bot ni explicaciones largas.`;
 
-REGLAS DE INFORMACIÓN:
-1. si te pido datos, noticias o info técnica, sacala SIEMPRE de fuentes confiables usando google search.
-2. priorizá sitios oficiales, diarios conocidos o documentación técnica.
-3. si la info es dudosa, avisame con tu onda (tipo "che, esto no se si es tan así pero...").
-`;
-
-// 2. DESPUÉS CONFIGURAMOS LAS RUTAS (Ahora sí 'app' existe)
 app.use(express.json());
 app.use(require("cors")());
-app.use(express.static(path.join(__dirname, "../cliente")));
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../cliente/index.html"));
+// --- CONFIGURACIÓN DEL FRONTEND (Lo que te faltaba) ---
+// Esto le dice a Express que use la carpeta "cliente" para imágenes, CSS y JS
+app.use(express.static(path.join(__dirname, '../cliente')));
+
+// Esto hace que cuando entres a http://localhost:8080/ se abra tu index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../cliente', 'index.html'));
 });
 
 // --- DISCORD ---
@@ -36,20 +32,25 @@ const client = new Client({
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot || !message.guild) return;
+  
   const sessionId = `discord-${message.author.id}`; 
   const historial = obtenerHistorial(sessionId);
+  
   const respuesta = await preguntarIA(message.content, historial, BOTANA_PROMPT);
+  
   guardarMensaje(sessionId, "user", message.content);
   guardarMensaje(sessionId, "model", respuesta);
-  await message.reply(respuesta);
+  
+  await message.reply(respuesta.toLowerCase()); 
 });
 
+// Asegurate de tener DISCORD_TOKEN en tu archivo .env
 client.login(process.env.DISCORD_TOKEN);
 
 // --- API WEB ---
 app.post("/chat", async (req, res) => {
   const { mensaje, sessionId } = req.body; 
-  if (!mensaje || !sessionId) return res.status(400).send("falta mensaje o id de sesion");
+  if (!mensaje || !sessionId) return res.status(400).send("falta info");
 
   const historial = obtenerHistorial(sessionId);
   const respuesta = await preguntarIA(mensaje, historial, BOTANA_PROMPT);
@@ -61,5 +62,5 @@ app.post("/chat", async (req, res) => {
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Botana activa en http://localhost:${PORT}`);
+  console.log(`✅ Botana activa y frontend disponible en el puerto ${PORT}`);
 });
