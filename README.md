@@ -1,63 +1,119 @@
-<div align="center">
-  <img src="https://capsule-render.vercel.app/render?type=soft&color=auto&height=200&section=header&text=BOTANA%20v1.0&fontSize=70&animation=fadeIn&fontAlignY=38&theme=cyberpunk" />
+<h1>🤖 Botana Project</h1>
 
-  <p align="center">
-    <img src="https://img.shields.io/badge/Discord-Bot-5865F2?style=for-the-badge&logo=discord&logoColor=white" />
-    <img src="https://img.shields.io/badge/Google_Cloud-VM_Instance-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white" />
-    <img src="https://img.shields.io/badge/Nginx-1.28.3-009639?style=for-the-badge&logo=nginx&logoColor=white" />
-  </p>
+<p><strong>Botana</strong> es una aplicación híbrida que integra un bot de <strong>Discord</strong> con una interfaz de chat web moderna. El sistema está diseñado para ofrecer una experiencia de usuario fluida, combinando inteligencia artificial con una infraestructura de red optimizada.</p>
 
-  <p align="center">
-    <img src="https://img.shields.io/badge/Status-Online-green?style=flat-square" />
-    <img src="https://img.shields.io/badge/License-MIT-purple?style=flat-square" />
-    <img src="https://img.shields.io/badge/Powered_by-Gemini_AI-orange?style=flat-square" />
-  </p>
-</div>
+<hr>
 
----
+<h2>🚀 Características Principales</h2>
 
-## 🏮 ¿Qué es Botana?
+<h3>🎮 Integración con Discord</h3>
+<p>Bot de chat inteligente potenciado por el modelo <strong>Gemini 2.5 Flash</strong>. Capaz de mantener conversaciones contextuales, realizar búsquedas en tiempo real y gestionar comandos personalizados con una personalidad definida.</p>
 
-**Botana** es un ecosistema híbrido diseñado para la interacción y la seguridad. No es solo un bot, es una entidad que vive en dos mundos:
+<h3>🌐 Interfaz Web</h3>
+<p>Single Page Application (SPA) con diseño <strong>Glassmorphism</strong>, optimizada para dispositivos móviles. Incluye animaciones cinemáticas mediante CSS y JavaScript para una interacción visual de alto nivel.</p>
 
-### 🎮 En Discord
-Actúa como un bot inteligente potenciado por IA (Gemini/OpenAI). Gestiona comandos, conversa con los usuarios y mantiene la comunidad activa con una personalidad única.
+<h3>🛡️ Seguridad y Monitoreo</h3>
+<ul>
+  <li><strong>Honeypot:</strong> Sistema integrado para la detección y registro de tráfico malicioso.</li>
+  <li><strong>Reverse Proxy:</strong> Configuración robusta sobre <strong>Nginx 1.28.3</strong> con terminación <strong>SSL (HTTPS)</strong>.</li>
+</ul>
 
-### 🌐 En la Web
-Posee una interfaz web propia donde puedes interactuar con él, ver su estado o gestionar configuraciones. Esta web corre sobre un servidor **Node.js** de alto rendimiento.
+<hr>
 
----
+<h2>🏗️ Stack Tecnológico</h2>
 
-## 🏗️ Infraestructura (The "Cloud" Spirit)
+<table>
+  <tr>
+    <th>Componente</th>
+    <th>Tecnología</th>
+  </tr>
+  <tr>
+    <td><strong>Entorno de ejecución</strong></td>
+    <td>Node.js (v18+)</td>
+  </tr>
+  <tr>
+    <td><strong>Framework de Bot</strong></td>
+    <td>Discord.js v14</td>
+  </tr>
+  <tr>
+    <td><strong>Servidor Web</strong></td>
+    <td>Express.js</td>
+  </tr>
+  <tr>
+    <td><strong>Infraestructura</strong></td>
+    <td>Google Cloud Platform (GCE)</td>
+  </tr>
+  <tr>
+    <td><strong>Sistema Operativo</strong></td>
+    <td>Debian Bookworm</td>
+  </tr>
+  <tr>
+    <td><strong>Gestión de Procesos</strong></td>
+    <td>PM2</td>
+  </tr>
+</table>
 
-Botana no corre en cualquier lugar; habita en una infraestructura optimizada para la velocidad y la seguridad:
+<hr>
 
-* **Host:** Una Instancia VM en **Google Cloud Platform (GCP)** corriendo **Debian Bookworm**.
-* **Gatekeeper:** **Nginx 1.28.3** configurado como Reverse Proxy, manejando el tráfico seguro mediante **SSL (HTTPS)**.
-* **Security:** Sistema de **Honeypot** integrado en las rutas web para detectar y registrar intentos de intrusión de bots maliciosos.
+<h2>🛠️ Instalación y Despliegue</h2>
 
+<h3>Clonar el repositorio</h3>
+<pre><code>git clone https://github.com/nehemi/botana.git
+cd botana/servidor
+</code></pre>
 
+<h3>Instalar dependencias</h3>
+<pre><code>npm install
+</code></pre>
 
----
+<h3>⚙️ Variables de entorno</h3>
+<p>Creá un archivo <code>.env</code> en la carpeta <code>servidor/</code>:</p>
 
-## ⚔️ Tecnologías (Otaku Stack)
+<pre><code>DISCORD_TOKEN=tu_token_de_discord
+GEMINI_API_KEY=tu_llave_de_google_ai
+</code></pre>
 
-| Componente | Tecnología |
-| :--- | :--- |
-| **Lenguaje** | Node.js (v18+) |
-| **Framework Bot** | Discord.js v14 |
-| **Web Server** | Express.js |
-| **Reverse Proxy** | Nginx 1.28.3 |
-| **Cloud** | Google Compute Engine |
-| **Database** | JSON / SQLite (Persistent Memory) |
+<hr>
 
----
+<h2>🚀 Despliegue con PM2</h2>
 
-## 🛠️ Instalación para Desarrolladores
+<h3>Iniciar el proceso</h3>
+<pre><code>pm2 start botana.js --name "botana-bot"
+</code></pre>
 
-Si quieres clonar este proyecto en tu propia VM de Google Cloud:
+<h3>Inicio automático</h3>
+<pre><code>pm2 startup
+pm2 save
+</code></pre>
 
-1. **Clonar el pergamino:**
-   ```bash
-   git clone [https://github.com/nehemi/botana.git](https://github.com/nehemi/botana.git)
-   cd botana/servidor
+<hr>
+
+<h2>🔒 Hardening y Red</h2>
+
+<ul>
+  <li><strong>Reverse Proxy (Nginx):</strong> Oculta firmas de servidor y gestiona SSL.</li>
+  <li><strong>Certificado SSL:</strong> Implementado con Certbot (Let's Encrypt).</li>
+  <li><strong>DNS Dinámico:</strong> Integración con DuckDNS mediante cron.</li>
+  <li><strong>Seguridad en Express:</strong> Cabeceras protegidas y <code>X-Powered-By</code> desactivado.</li>
+</ul>
+
+<hr>
+
+<h2>📂 Estructura del Proyecto</h2>
+
+<pre><code>botana/
+├── cliente/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+├── servidor/
+│   ├── botana.js
+│   ├── .env
+│   └── package.json
+└── duckdns/
+    └── duck.sh
+</code></pre>
+
+<hr>
+</body>
+</html>
