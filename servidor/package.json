@@ -1,0 +1,16 @@
+{
+  "name": "botana-servidor",
+  "version": "1.0.0",
+  "description": "Botana - Bot de Discord y API",
+  "main": "botana.js",
+  "scripts": {
+    "start": "node botana.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.11.1",
+    "cors": "^2.8.5",
+    "discord.js": "^14.15.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}
