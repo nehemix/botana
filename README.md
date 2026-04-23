@@ -79,7 +79,7 @@ GEMINI_API_KEY=tu_llave_de_google_ai
 
 <p>Para una ejecución aislada, limpia y más sencilla, puedes usar Docker y Docker Compose:</p>
 
-<pre><code>docker-compose up -d --build
+<pre><code>docker compose up -d --build
 </code></pre>
 <p>Esto construirá la imagen copiando tu frontend/backend y levantará el contenedor en el puerto 8080 de forma automática leyendo las credenciales de tu archivo <code>servidor/.env</code>.</p>
 
