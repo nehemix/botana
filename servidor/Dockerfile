@@ -1,20 +1,13 @@
-# Usamos Debian Slim, que mantiene un tamaño reducido pero recibe
-# parches de seguridad mucho más rápido que Alpine.
-FROM node:20-bookworm-slim
+# Usamos una imagen ligera de Node.js versión 20
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Le damos permisos al usuario "node" sobre el directorio
-RUN chown -R node:node /app
-
-# Cambiamos al usuario sin privilegios incluido en la imagen
-USER node
-
-# Copiamos dependencias y asignamos dueño
-COPY --chown=node:node package*.json ./
+# Copiamos los archivos de dependencias e instalamos
+COPY package*.json ./
 RUN npm install
 
-# Copiamos el resto del código y asignamos dueño
-COPY --chown=node:node . .
+# Copiamos el resto del código
+COPY . .
 
 CMD ["node", "index.js"]

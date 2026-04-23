@@ -1,6 +1,5 @@
-# Usamos Debian Slim, que mantiene un tamaño reducido pero recibe
-# parches de seguridad mucho más rápido que Alpine.
-FROM node:20-bookworm-slim
+# Usamos una imagen ligera de Node.js versión 20
+FROM node:20-alpine
 
 WORKDIR /app
 
