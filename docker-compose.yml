@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  botana:
+    build: .
+    container_name: botana-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./servidor/.env
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+    # Nota: Si en el futuro necesitas que "chat.json" u otra memoria se guarde
+    # permanentemente en el disco, aquí puedes mapear un volumen local.

@@ -75,7 +75,17 @@ GEMINI_API_KEY=tu_llave_de_google_ai
 
 <hr>
 
-<h2>🚀 Despliegue con PM2</h2>
+<h2>🐳 Despliegue con Docker (Recomendado)</h2>
+
+<p>Para una ejecución aislada, limpia y más sencilla, puedes usar Docker y Docker Compose:</p>
+
+<pre><code>docker-compose up -d --build
+</code></pre>
+<p>Esto construirá la imagen copiando tu frontend/backend y levantará el contenedor en el puerto 8080 de forma automática leyendo las credenciales de tu archivo <code>servidor/.env</code>.</p>
+
+<hr>
+
+<h2>� Despliegue con PM2</h2>
 
 <h3>Iniciar el proceso</h3>
 <pre><code>pm2 start botana.js --name "botana-bot"

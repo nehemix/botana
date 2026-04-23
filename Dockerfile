@@ -1,18 +1,21 @@
-# Usamos Node liviano
 FROM node:18-alpine
-WORKDIR /usr/src/app
 
-# Copiamos archivos de dependencias desde la carpeta servidor
-COPY servidor/package*.json ./
-RUN npm install --only=production
+# Establecer el directorio de trabajo principal
+WORKDIR /app
 
-# Copiamos el código del servidor y la carpeta del cliente
+# Copiar los archivos de configuración de dependencias primero
+# Esto ayuda a aprovechar la caché de Docker y acelerar builds posteriores
+COPY servidor/package*.json ./servidor/
+
+# Instalar las dependencias de producción
+RUN cd servidor && npm install --omit=dev
+
+# Copiar el resto del código del servidor y el cliente
 COPY servidor/ ./servidor/
 COPY cliente/ ./cliente/
 
-# Exponemos el puerto dinámico de Google Cloud
-ENV PORT=8080
+# Exponer el puerto donde corre la app web
 EXPOSE 8080
 
-# Ejecutamos desde la carpeta servidor
-CMD [ "node", "servidor/botana.js" ]
+# Comando por defecto para iniciar la aplicación
+CMD ["node", "servidor/botana.js"]
