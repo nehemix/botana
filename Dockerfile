@@ -1,25 +1,20 @@
-FROM node:18-alpine
+# Usamos Debian Slim, que mantiene un tamaño reducido pero recibe
+# parches de seguridad mucho más rápido que Alpine.
+FROM node:20-bookworm-slim
 
-# Establecer el directorio de trabajo principal
 WORKDIR /app
 
-# Asignar permisos al usuario sin privilegios "node"
+# Le damos permisos al usuario "node" sobre el directorio de trabajo
 RUN chown -R node:node /app
+
+# Cambiamos al usuario sin privilegios "node" (incluido por defecto en la imagen)
 USER node
 
-# Copiar los archivos de configuración de dependencias primero
-# Esto ayuda a aprovechar la caché de Docker y acelerar builds posteriores
-COPY --chown=node:node servidor/package*.json ./servidor/
+# Copiamos los archivos de dependencias e instalamos
+COPY --chown=node:node package*.json ./
+RUN npm install
 
-# Instalar las dependencias de producción
-RUN cd servidor && npm install --omit=dev
+# Copiamos el resto del código
+COPY --chown=node:node . .
 
-# Copiar el resto del código del servidor y el cliente
-COPY --chown=node:node servidor/ ./servidor/
-COPY --chown=node:node cliente/ ./cliente/
-
-# Exponer el puerto donde corre la app web
-EXPOSE 8080
-
-# Comando por defecto para iniciar la aplicación
-CMD ["node", "servidor/botana.js"]
+CMD ["node", "index.js"]
