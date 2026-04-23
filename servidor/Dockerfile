@@ -10,4 +10,4 @@ RUN npm install
 # Copiamos el resto del código
 COPY . .
 
-CMD ["node", "index.js"]
+CMD ["node", "botana.js"]

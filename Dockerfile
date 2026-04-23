@@ -10,10 +10,11 @@ RUN chown -R node:node /app
 USER node
 
 # Copiamos los archivos de dependencias e instalamos
-COPY --chown=node:node package*.json ./
-RUN npm install
+COPY --chown=node:node servidor/package*.json ./servidor/
+RUN cd servidor && npm install --omit=dev
 
 # Copiamos el resto del código
-COPY --chown=node:node . .
+COPY --chown=node:node servidor/ ./servidor/
+COPY --chown=node:node cliente/ ./cliente/
 
-CMD ["node", "index.js"]
+CMD ["node", "servidor/botana.js"]
