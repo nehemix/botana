@@ -44,6 +44,13 @@ client.on("messageCreate", async (message) => {
   await message.reply(respuesta.toLowerCase()); 
 });
 
+// Validación para evitar que la app crashee sin un mensaje claro
+if (!process.env.DISCORD_TOKEN) {
+  console.error("❌ ERROR FATAL: El token sigue vacío. Docker no está inyectando el .env");
+  process.exit(1);
+} else {
+  console.log("✅ Token leído correctamente por Node.js");
+}
 // Asegurate de tener DISCORD_TOKEN en tu archivo .env
 client.login(process.env.DISCORD_TOKEN);
 
