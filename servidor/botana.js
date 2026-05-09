@@ -1,7 +1,7 @@
-require("dotenv").config();
+const path = require("path"); // Importante para las rutas de carpetas
+require("dotenv").config({ path: path.join(__dirname, '.env') });
 const { Client, GatewayIntentBits } = require("discord.js");
 const express = require("express");
-const path = require("path"); // Importante para las rutas de carpetas
 const { preguntarIA } = require("./ai");
 const { obtenerHistorial, guardarMensaje } = require("./memory");
 
