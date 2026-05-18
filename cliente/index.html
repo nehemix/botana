@@ -304,15 +304,13 @@
             chatWindow.scrollTop = chatWindow.scrollHeight;
         });
     </script>
-    <script src="script.js">
-        // Bloqueo total de zoom por gestos
-document.addEventListener('touchstart', (e) => {
-    if (e.touches.length > 1) e.preventDefault();
-}, { passive: false });
-
-document.addEventListener('gesturestart', (e) => {
-    e.preventDefault();
-});
+    <script src="script.js"></script>
+    <script>
+        // Bloqueo total de zoom por gestos en móviles
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
     </script>
 </body>
 </html>

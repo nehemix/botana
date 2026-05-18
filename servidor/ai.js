@@ -21,7 +21,7 @@ async function preguntarIA(pregunta, historial = [], promptPersonalidad) {
         "Authorization": `Bearer ${process.env.DEEPSEEK_API_KEY}`
       },
       body: JSON.stringify({
-        model: "deepseek-chat", // Modelo rápido de DeepSeek
+        model: "deepseek-v4-flash", // Nuevo modelo rápido de DeepSeek V4
         messages: messages
       })
     });

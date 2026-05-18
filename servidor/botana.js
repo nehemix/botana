@@ -31,27 +31,40 @@ const client = new Client({
 });
 
 client.on("messageCreate", async (message) => {
-  if (message.author.bot || !message.guild) return;
+  // Hacemos que el bot solo responda si lo mencionan
+  if (message.author.bot || !message.guild || !message.mentions.has(client.user)) {
+    return;
+  }
   
   const sessionId = `discord-${message.author.id}`; 
   const historial = obtenerHistorial(sessionId);
   
-  const respuesta = await preguntarIA(message.content, historial, BOTANA_PROMPT);
+  // Limpiamos la mención del mensaje para que la IA no la procese
+  const preguntaLimpia = message.content.replace(/<@!?\d+>/g, '').trim();
+  const respuesta = await preguntarIA(preguntaLimpia, historial, BOTANA_PROMPT);
   
-  guardarMensaje(sessionId, "user", message.content);
+  guardarMensaje(sessionId, "user", preguntaLimpia);
   guardarMensaje(sessionId, "model", respuesta);
   
   await message.reply(respuesta.toLowerCase()); 
 });
 
-// Validación para evitar que la app crashee sin un mensaje claro
+// --- VALIDACIÓN DE CREDENCIALES ---
+// Esto nos dirá exactamente qué claves está viendo Node.js al arrancar.
 if (!process.env.DISCORD_TOKEN) {
-  console.error("❌ ERROR FATAL: El token sigue vacío. Docker no está inyectando el .env");
+  console.error("❌ ERROR: No se encontró DISCORD_TOKEN. Revisa tu archivo .env.");
   process.exit(1);
 } else {
-  console.log("✅ Token leído correctamente por Node.js");
+  console.log("✅ DISCORD_TOKEN encontrado.");
 }
-// Asegurate de tener DISCORD_TOKEN en tu archivo .env
+
+if (!process.env.DEEPSEEK_API_KEY) {
+  console.error("❌ ERROR: No se encontró DEEPSEEK_API_KEY. Revisa tu archivo .env.");
+  process.exit(1);
+} else {
+  console.log(`✅ DEEPSEEK_API_KEY encontrada. Usando clave que termina en: ...${process.env.DEEPSEEK_API_KEY.slice(-4)}`);
+}
+
 client.login(process.env.DISCORD_TOKEN);
 
 // --- API WEB ---
