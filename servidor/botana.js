@@ -23,11 +23,13 @@ setInterval(() => rateLimit.clear(), 60000);
 
 const rateLimiterMiddleware = (req, res, next) => {
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  const count = rateLimit.get(ip) || 0;
-  if (count >= 15) {
+  const sessionId = req.body?.sessionId || 'unknown';
+  const key = `${ip}-${sessionId}`; // Limitamos por combinación de IP y sesión
+  const count = rateLimit.get(key) || 0;
+  if (count >= 10) {
     return res.status(429).json({ respuesta: "pará emocion, me estás mandando muchos mensajes. aguantá un toque." });
   }
-  rateLimit.set(ip, count + 1);
+  rateLimit.set(key, count + 1);
   next();
 };
 
@@ -90,14 +92,23 @@ client.login(process.env.DISCORD_TOKEN);
 // --- API WEB ---
 app.post("/chat", rateLimiterMiddleware, async (req, res) => {
   const { mensaje, sessionId } = req.body; 
-  if (!mensaje || !sessionId) return res.status(400).send("falta info");
-  if (mensaje.length > 2000) return res.status(400).json({ respuesta: "mucho texto, resumilo un toque." });
+  
+  // Validación estricta del backend (Tipos y longitud)
+  if (!mensaje || typeof mensaje !== 'string' || !sessionId || typeof sessionId !== 'string') {
+    return res.status(400).json({ respuesta: "falta info o el formato es incorrecto." });
+  }
+  
+  const mensajeLimpio = mensaje.trim();
+  const sidLimpio = sessionId.trim().substring(0, 100); // Prevenir payloads maliciosos enormes en memoria
+  
+  if (mensajeLimpio.length === 0) return res.status(400).json({ respuesta: "no me mandaste nada." });
+  if (mensajeLimpio.length > 2000) return res.status(400).json({ respuesta: "mucho texto, resumilo un toque." });
 
-  const historial = obtenerHistorial(sessionId);
-  const respuesta = await preguntarIA(mensaje, historial, BOTANA_PROMPT);
+  const historial = obtenerHistorial(sidLimpio);
+  const respuesta = await preguntarIA(mensajeLimpio, historial, BOTANA_PROMPT);
 
-  guardarMensaje(sessionId, "user", mensaje);
-  guardarMensaje(sessionId, "model", respuesta);
+  guardarMensaje(sidLimpio, "user", mensajeLimpio);
+  guardarMensaje(sidLimpio, "model", respuesta);
   res.json({ respuesta });
 });
 

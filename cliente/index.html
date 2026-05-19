@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Botana Chat</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
@@ -276,20 +277,44 @@
                 return;
             }
 
+            const sendBtn = document.querySelector('.send-btn');
+            sendBtn.disabled = true;
+            input.disabled = true;
+
             appendMsg(mensaje, 'user');
             input.value = '';
             input.style.height = 'auto';
             
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos de timeout
+
             try {
                 const res = await fetch('/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mensaje, sessionId: sid })
+                    body: JSON.stringify({ mensaje, sessionId: sid }),
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
+
+                if (!res.ok) {
+                    throw new Error(`Error HTTP: ${res.status}`);
+                }
+
                 const data = await res.json();
                 appendMsg(data.respuesta, 'bot');
             } catch (e) {
-                appendMsg('Error de conexión. Inténtalo de nuevo.', 'bot');
+                if (e.name === 'AbortError') {
+                    appendMsg('Se acabó el tiempo de espera. Inténtalo de nuevo.', 'bot');
+                } else {
+                    appendMsg('Error de conexión o de servidor. Inténtalo de nuevo.', 'bot');
+                }
+                console.error(e);
+            } finally {
+                sendBtn.disabled = false;
+                input.disabled = false;
+                input.focus();
             }
         }
 
@@ -299,6 +324,11 @@
             div.textContent = text;
             chatWindow.appendChild(div);
             
+            // Mantener un máximo de 50 mensajes en el DOM
+            while (chatWindow.children.length > 50) {
+                chatWindow.removeChild(chatWindow.firstChild);
+            }
+
             chatWindow.scrollTo({
                 top: chatWindow.scrollHeight,
                 behavior: 'smooth'
