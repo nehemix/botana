@@ -234,14 +234,14 @@
 
         <footer class="input-area">
             <button class="clear-btn" onclick="limpiarMemoria()" title="Borrar memoria">🗑️</button>
-            <textarea id="userInput" placeholder="Escribile algo..." autocomplete="off" rows="1"></textarea>
+            <textarea id="userInput" placeholder="Escribile algo..." autocomplete="off" rows="1" maxlength="2000"></textarea>
             <button class="send-btn" onclick="enviar()">➜</button>
         </footer>
     </div>
 
     <script>
         // SID dinámico para manejar sesiones
-        const sid = localStorage.getItem('botana_sid') || ('web-' + Math.random().toString(36).substr(2, 9));
+        const sid = localStorage.getItem('botana_sid') || crypto.randomUUID();
         localStorage.setItem('botana_sid', sid);
 
         const chatWindow = document.getElementById('chat-window');
@@ -270,6 +270,11 @@
         async function enviar() {
             const mensaje = input.value.trim();
             if (!mensaje) return;
+
+            if (mensaje.length > 2000) {
+                alert("El mensaje es demasiado largo. El máximo es de 2000 caracteres.");
+                return;
+            }
 
             appendMsg(mensaje, 'user');
             input.value = '';

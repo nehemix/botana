@@ -16,6 +16,21 @@ ESTILO DE CHAT:
 app.use(express.json());
 app.use(require("cors")());
 
+// --- SISTEMA DE RATE LIMITING BÁSICO ---
+const rateLimit = new Map();
+// Limpiamos el contador cada 60 segundos
+setInterval(() => rateLimit.clear(), 60000);
+
+const rateLimiterMiddleware = (req, res, next) => {
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const count = rateLimit.get(ip) || 0;
+  if (count >= 15) {
+    return res.status(429).json({ respuesta: "pará emocion, me estás mandando muchos mensajes. aguantá un toque." });
+  }
+  rateLimit.set(ip, count + 1);
+  next();
+};
+
 // --- CONFIGURACIÓN DEL FRONTEND (Lo que te faltaba) ---
 // Esto le dice a Express que use la carpeta "cliente" para imágenes, CSS y JS
 app.use(express.static(path.join(__dirname, '../cliente')));
@@ -41,6 +56,11 @@ client.on("messageCreate", async (message) => {
   
   // Limpiamos la mención del mensaje para que la IA no la procese
   const preguntaLimpia = message.content.replace(/<@!?\d+>/g, '').trim();
+
+  if (preguntaLimpia.length > 2000) {
+    return message.reply("mucho texto, resumilo un toque que no leo tanto.");
+  }
+  
   const respuesta = await preguntarIA(preguntaLimpia, historial, BOTANA_PROMPT);
   
   guardarMensaje(sessionId, "user", preguntaLimpia);
@@ -68,9 +88,10 @@ if (!process.env.DEEPSEEK_API_KEY) {
 client.login(process.env.DISCORD_TOKEN);
 
 // --- API WEB ---
-app.post("/chat", async (req, res) => {
+app.post("/chat", rateLimiterMiddleware, async (req, res) => {
   const { mensaje, sessionId } = req.body; 
   if (!mensaje || !sessionId) return res.status(400).send("falta info");
+  if (mensaje.length > 2000) return res.status(400).json({ respuesta: "mucho texto, resumilo un toque." });
 
   const historial = obtenerHistorial(sessionId);
   const respuesta = await preguntarIA(mensaje, historial, BOTANA_PROMPT);
