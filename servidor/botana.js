@@ -16,6 +16,12 @@ ESTILO DE CHAT:
 app.use(express.json());
 app.use(require("cors")());
 
+// Seguridad: Añadir encabezados HTTP, incluyendo frame-ancestors que no funciona en <meta>
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", "frame-ancestors 'none';");
+  next();
+});
+
 // --- SISTEMA DE RATE LIMITING BÁSICO ---
 const rateLimit = new Map();
 // Limpiamos el contador cada 60 segundos
